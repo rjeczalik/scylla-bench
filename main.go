@@ -6,13 +6,14 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
 
 	"github.com/gocql/gocql"
-	"github.com/hailocab/go-hostpool"
+	hostpool "github.com/hailocab/go-hostpool"
 	"github.com/pkg/errors"
 	"github.com/scylladb/scylla-bench/random"
 )
@@ -21,7 +22,7 @@ type DistributionValue struct {
 	Dist *random.Distribution
 }
 
-func MakeDistributionValue (dist *random.Distribution, defaultDist random.Distribution) *DistributionValue {
+func MakeDistributionValue(dist *random.Distribution, defaultDist random.Distribution) *DistributionValue {
 	*dist = defaultDist
 	return &DistributionValue{dist}
 }
@@ -65,9 +66,9 @@ var (
 
 	testDuration time.Duration
 
-	partitionCount         int64
-	clusteringRowCount     int64
-	clusteringRowSizeDist  random.Distribution
+	partitionCount        int64
+	clusteringRowCount    int64
+	clusteringRowSizeDist random.Distribution
 
 	rowsPerRequest    int
 	provideUpperBound bool
@@ -76,7 +77,7 @@ var (
 
 	rangeCount int
 
-	timeout time.Duration
+	timeout    time.Duration
 	iterations uint
 
 	startTime time.Time
@@ -227,7 +228,7 @@ func main() {
 
 	flag.StringVar(&nodes, "nodes", "127.0.0.1", "nodes")
 	flag.BoolVar(&clientCompression, "client-compression", true, "use compression for client-coordinator communication")
-	flag.IntVar(&concurrency, "concurrency", 16, "number of used goroutines")
+	flag.IntVar(&concurrency, "concurrency", runtime.GOMAXPROCS(0), "number of used goroutines")
 	flag.IntVar(&connectionCount, "connection-count", 4, "number of connections")
 	flag.IntVar(&maximumRate, "max-rate", 0, "the maximum rate of outbound requests in op/s (0 for unlimited)")
 	flag.IntVar(&pageSize, "page-size", 1000, "page size")
